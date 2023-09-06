@@ -104,9 +104,10 @@
     background: #111;
     border-radius: 50%;
   }
-  .game > div.revealed{
-    background: #ddd;
+  .game > div.revealed {
+  background: #fff; /* Cor vermelha */
   }
+
 </style>
 
 {#if gameover}
