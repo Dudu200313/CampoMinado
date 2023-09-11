@@ -1,30 +1,28 @@
 <script>
-  import { onMount } from 'svelte';
-  import { row, col } from '../store.js'
-  import { goto } from '$app/navigation';
+  import { onMount } from "svelte";
+  import { row, col } from "../store.js";
+  import { goto } from "$app/navigation";
   import "../app.css";
-  
-  
 
   let nodes = 10;
   let waveHeight = 150;
   let colours = ["#fff", "#44c2ce"];
   let canvases = [
     {
-      id: 'canvas',
-      waves: []
+      id: "canvas",
+      waves: [],
     },
     {
-      id: 'canvas-bottom',
-      waves: []
-    }
+      id: "canvas-bottom",
+      waves: [],
+    },
   ];
 
   function init() {
-    canvases.forEach(canvasObj => {
+    canvases.forEach((canvasObj) => {
       let canvas = document.getElementById(canvasObj.id);
       canvasObj.element = canvas;
-      canvasObj.context = canvas.getContext('2d');
+      canvasObj.context = canvas.getContext("2d");
       resizeCanvas(canvas);
 
       for (let i = 0; i < 3; i++) {
@@ -61,20 +59,20 @@
     this.nodes = [];
 
     for (let i = 0; i <= nodes + 2; i++) {
-      let temp = [(i - 1) * cvsWidth / nodes, 0, Math.random() * 200, 0.3];
+      let temp = [((i - 1) * cvsWidth) / nodes, 0, Math.random() * 200, 0.3];
       this.nodes.push(temp);
     }
   }
 
   function bounce(nodeArr, cvs) {
-    nodeArr[1] = waveHeight / 2 * Math.sin(nodeArr[2] / 20) + cvs.height / 2;
+    nodeArr[1] = (waveHeight / 2) * Math.sin(nodeArr[2] / 20) + cvs.height / 2;
     nodeArr[2] = nodeArr[2] + nodeArr[3];
   }
 
   function drawWave(obj, ctx, cvs) {
-    let diff = function(a, b) {
+    let diff = function (a, b) {
       return (b - a) / 2 + a;
-    }
+    };
 
     ctx.fillStyle = obj.colour;
     ctx.beginPath();
@@ -84,8 +82,10 @@
     for (let i = 0; i < obj.nodes.length; i++) {
       if (obj.nodes[i + 1]) {
         ctx.quadraticCurveTo(
-          obj.nodes[i][0], obj.nodes[i][1],
-          diff(obj.nodes[i][0], obj.nodes[i + 1][0]), diff(obj.nodes[i][1], obj.nodes[i + 1][1])
+          obj.nodes[i][0],
+          obj.nodes[i][1],
+          diff(obj.nodes[i][0], obj.nodes[i + 1][0]),
+          diff(obj.nodes[i][1], obj.nodes[i + 1][1])
         );
       } else {
         ctx.lineTo(obj.nodes[i][0], obj.nodes[i][1]);
@@ -112,22 +112,22 @@
   }
 
   onMount(init);
-  
-  function startGame(){
-    goto('game')
+
+  function startGame() {
+    goto("game");
   }
-  
 </script>
+
 <div class="canvas-wrap top">
-  <canvas id="canvas" class="test"></canvas>
+  <canvas id="canvas" class="test" />
 </div>
 
 <div class="canvas-wrap bottom">
-  <canvas id="canvas-bottom" class="test"></canvas>
+  <canvas id="canvas-bottom" class="test" />
 </div>
 
 <div class="wrap">
-  <input type="checkbox" id="form_switch" style="display: none;">
+  <input type="checkbox" id="form_switch" style="display: none;" />
   <div class="flipcard">
     <div class="flipcard-inner">
       <div class="flipcard-front">
@@ -139,137 +139,138 @@
           <button id="col-button" class="input-label">Columns</button>
           <input id="col-input" class="input-field" bind:value={$col} />
 
-          <button class="start-button" on:click={() => startGame($row, $col)}>Start Game</button>
+          <button class="start-button" on:click={() => startGame($row, $col)}
+            >Start Game</button
+          >
         </div>
       </div>
     </div>
   </div>
 </div>
-  <style>
-    
-    * {
-  box-sizing: border-box;
-}
 
-body {
-  margin: 0;
-  padding: 0;
-  font-family: Arial, sans-serif; /* Adicione a fonte desejada */
-}
+<style>
+  * {
+    box-sizing: border-box;
+  }
 
-.canvas-wrap {
-  max-width: 100%;
-  overflow: hidden;
-  position: absolute;
-}
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif; /* Adicione a fonte desejada */
+  }
 
-canvas {
-  display: block;
-}
+  .canvas-wrap {
+    max-width: 100%;
+    overflow: hidden;
+    position: absolute;
+  }
 
-.top {
-  top: 0;
-}
+  canvas {
+    display: block;
+  }
 
-.bottom {
-  bottom: 0;
-  transform: rotate(180deg);
-}
+  .top {
+    top: 0;
+  }
 
-.wrap {
-  width: 350px;
-  margin: 45px auto;
-  padding: 20px; /* Aumentei o padding para dar mais espaço entre os elementos */
+  .bottom {
+    bottom: 0;
+    transform: rotate(180deg);
+  }
 
-}
+  .wrap {
+    width: 350px;
+    margin: 45px auto;
+    padding: 20px; /* Aumentei o padding para dar mais espaço entre os elementos */
+  }
 
-.minesweeper-container {
-  text-align: center;
-}
+  .minesweeper-container {
+    text-align: center;
+  }
 
-.titulo {
-background-color: white;
-padding: 10px;
-margin: 10px;
-}
+  .titulo {
+    background-color: white;
+    padding: 10px;
+    margin: 10px;
+  }
 
-.input-label,
-.input-field,
-.start-button {
-  display: block;
-  width: 100%;
-  margin-bottom: 10px;
-}
+  .input-label,
+  .input-field,
+  .start-button {
+    display: block;
+    width: 100%;
+    margin-bottom: 10px;
+  }
 
-.input-label {
-  background: #69d2e7;
-  color: #fff;
-  padding: 10px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
+  .input-label {
+    background: #69d2e7;
+    color: #fff;
+    padding: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
 
-.input-label:hover {
-  background: #69c8e7;
-}
+  .input-label:hover {
+    background: #69c8e7;
+  }
 
-.input-field {
-  padding: 10px;
-  border: 1px solid #ddd;
-  background: #fafafa;
-}
+  .input-field {
+    padding: 10px;
+    border: 1px solid #ddd;
+    background: #fafafa;
+  }
 
-.start-button {
-  background: #2c91d8;
-  color: #fff;
-  padding: 10px;
-  text-transform: uppercase;
-  border: none;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
+  .start-button {
+    background: #2c91d8;
+    color: #fff;
+    padding: 10px;
+    text-transform: uppercase;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
 
-.start-button:hover {
-  background: #2c91a8;
-}
+  .start-button:hover {
+    background: #2c91a8;
+  }
 
-.flipcard {
-  background-color: transparent;
-  width: 350px;
-  perspective: 1000px;
-}
+  .flipcard {
+    background-color: transparent;
+    width: 350px;
+    perspective: 1000px;
+  }
 
-.flipcard-inner {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  text-align: center;
-  transition: transform 0.8s;
-  transform-style: preserve-3d;
-}
+  .flipcard-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    transition: transform 0.8s;
+    transform-style: preserve-3d;
+  }
 
-.flipcard-front,
-.flipcard-back {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  backface-visibility: hidden;
-}
+  .flipcard-front,
+  .flipcard-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+  }
 
-.flipcard-front {
-  color: black;
-}
+  .flipcard-front {
+    color: black;
+  }
 
-.flipcard-back {
-  background-color: dodgerblue;
-  transform: rotateY(180deg);
-}
+  .flipcard-back {
+    background-color: dodgerblue;
+    transform: rotateY(180deg);
+  }
 
-input[type="checkbox"]:checked + .flipcard .flipcard-inner {
-  transform: rotateY(180deg);
-}
+  input[type="checkbox"]:checked + .flipcard .flipcard-inner {
+    transform: rotateY(180deg);
+  }
 
-.label-highlight {
-  color: blue;
-}
-  </style>
+  .label-highlight {
+    color: blue;
+  }
+</style>

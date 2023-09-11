@@ -1,76 +1,111 @@
 <script>
-  import { row, col } from '../../store.js'
-  let gameover = false
-  let grid = []
-  let bombs = $row * ($row/4)
+  import { row, col } from "../../store.js";
+  let gameover = false;
+  let grid = [];
+  let carX = 0;
+  let carY = 0;
+  let bombs = $row * ($row / 4);
+  let forceField = $row * ($row / 5);
 
-  for(let i = 0; i < $row; i++){
-    grid[i] = new Array($col)
-    for(let j = 0; j < $col; j++){
-      grid[i][j] = {
-        bomb: false,
-        revealed: false,
-        distance: 0
+  for (let i = 0; i < $row; i++) {
+    grid[i] = new Array($col);
+    for (let j = 0; j < $col; j++) {
+      grid[i][j] = 0;
+    }
+  }
+
+  for (let i = 0; i < bombs; i++) {
+    let x = Math.floor(Math.random() * $row);
+    let y = Math.floor(Math.random() * $col);
+    if (
+      grid[x][y] == 1 ||
+      grid[x][y] == 2 ||
+      (x == 0 && y == 0) ||
+      (x == $row - 1 && y == $row - 1)
+    ) {
+      i--;
+      continue;
+    }
+    grid[x][y] = 1;
+  }
+
+  for (let i = 0; i < forceField; i++) {
+    let x = Math.floor(Math.random() * $row);
+    let y = Math.floor(Math.random() * $col);
+    if (
+      grid[x][y] == 1 ||
+      grid[x][y] == 2 ||
+      (x == 0 && y == 0) ||
+      (x == $row - 1 && y == $row - 1)
+    ) {
+      i--;
+      continue;
+    }
+    grid[x][y] = 2;
+  }
+
+  function onKeyDown(e) {
+    if (!gameover) {
+      switch (e.keyCode) {
+        case 37:
+          carY -= 1;
+          moverCarro();
+          break;
+        case 38:
+          carX -= 1;
+          moverCarro();
+          break;
+        case 39:
+          carY += 1;
+          moverCarro();
+          break;
+        case 40:
+          carX += 1;
+          moverCarro();
+          break;
       }
     }
   }
 
-  for(let i = 0; i < bombs; i++){
-    let x = Math.floor(Math.random()*$row)
-    let y = Math.floor(Math.random()*$col)
-    if(grid[x][y].bomb){
-      i--
-      continue
-    }
-    grid[x][y].bomb = true
-  }
-  
-  function countDistance(i, j){
-    let count = 0
-    for(let x = -1; x <= 1; x++){
-      for(let y = -1; y <= 1; y++){
-        try{
-          if(grid[x+i][y+j].bomb){
-            count++
-          }
-        } catch(msg){}
-      }
-    }
-    grid[i][j].distance = count
-  }
-  for(let i = 0; i < $row; i++){
-    for(let j = 0; j < $col; j++){
-      countDistance(i, j)
+  function moverCarro() {
+    console.log(grid);
+    console.log("CarX: " + carX + ", CarY: " + carY);
+    if (grid[carX][carY] == 1) {
+      gameover = true;
+      console.log("Bateu numa bomba!");
+    } else if (grid[carX][carY] == 2) {
+      console.log("Achasse um campo de forÃ§a!");
     }
   }
-  function revealBox(i, j){
-    grid[i][j].revealed = true
-    if(grid[i][j].bomb){
-      gameover = true
-      for(let i = 0; i < $row; i++){
-        for(let j = 0; j < $col; j++){
-          if(grid[i][j].bomb){
-            grid[i][j].revealed = true
-          }
-        }
-      }
+
+  function getBoxClass(box, i, j) {
+    if (box === 1) {
+      return "bomb";
+    } else if (box === 2) {
+      return "force-field";
+    } else if (carX === i && carY === j) {
+      return "car";
     }
-    if(grid[i][j].distance == 0){
-      for(let x = -1; x <= 1; x++){
-        for(let y = -1; y <= 1; y++){
-          try{
-            if(!grid[x+i][y+j].bomb && !grid[x+i][y+j].revealed){
-              revealBox(x+i, y+j)
-            }
-          }catch(msg){}
-        }
-      }
-    }
+    return "";
   }
 </script>
 
+{#if gameover}
+  <h1 style="font-size: 200px;">Gameover</h1>
+{/if}
+
+<svelte:window on:keydown|preventDefault={onKeyDown} />
+<div class="game" style="--row: {$row}; --col: {$col};">
+  {#each grid as $row, i}
+    {#each $row as box, j}
+      <div class={getBoxClass(box, i, j)} />
+    {/each}
+  {/each}
+  <a href="/" class="start-button">Voltar a tela inicial</a>
+</div>
+
 <style>
-  .game{
+  .game {
     position: fixed;
     top: 50%;
     left: 50%;
@@ -81,7 +116,7 @@
     flex-wrap: wrap;
   }
 
-  .game > div{
+  .game > div {
     width: calc(100% / var(--col));
     height: calc(100% / var(--row));
     display: flex;
@@ -93,39 +128,27 @@
     cursor: pointer;
     position: relative;
   }
-  .game > div.bomb:before{
-    content: "";
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 20px;
-    height: 20px;
-    background: #111;
-    border-radius: 50%;
+  .game > div.car {
+    background-color: yellow; /* Cor do carro */
   }
-  .game > div.revealed {
-  background: #fff; /* Cor vermelha */
+  .game > div.force-field {
+    background-color: aquamarine;
+  }
+  .game > div.bomb {
+    background-color: red;
   }
 
+  /* Estilos para o botão fictício */
+  .start-button {
+    display: inline-block;
+    padding: 12px 24px;
+    background-color: #007bff;
+    color: #fff;
+    text-align: center;
+    transform: translate(63%, 10%);
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+    cursor: pointer;
+  }
 </style>
-
-{#if gameover}
-  <h1>Gameover</h1>
-{/if}
-
-<div class="game" style="--row: {$row}; --col: {$col};">
-  {#each grid as $row, i}
-    {#each $row as box, j}
-      {#if box.revealed}
-        <div class:bomb={box.bomb} class:revealed={box.revealed}>
-          {#if box.distance > 0}
-            {box.distance}
-          {/if}
-        </div>
-      {:else}
-        <div on:click={()=>{revealBox(i, j)}}></div>
-      {/if}
-    {/each}
-  {/each}
-</div>
