@@ -139,9 +139,12 @@
           <button id="col-button" class="input-label">Columns</button>
           <input id="col-input" class="input-field" bind:value={$col} />
 
+         
+
           <button class="start-button" on:click={() => startGame($row, $col)}
             >Start Game</button
           >
+           <a href="/apresentacao" class="start-button">Apresentação</a>
         </div>
       </div>
     </div>
@@ -273,4 +276,21 @@
   .label-highlight {
     color: blue;
   }
+
+  .start-button {
+        display: inline-block;
+        padding: 12px 24px;
+        background-color: #007bff;
+        color: #fff;
+        font-size: 18px;
+        text-decoration: none;
+        border-radius: 5px;
+        transition: background-color 0.3s;
+        cursor: pointer;
+    }
+
+    .start-button:hover {
+        background-color: #0e78e9;
+    }
+
 </style>
